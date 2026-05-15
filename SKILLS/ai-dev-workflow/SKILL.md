@@ -1,164 +1,132 @@
-# AI Development Workflow Skill (Approval-Gated Version)
+# AI 開發閉環工作流技能
 
-## Summary
+## 摘要
 
-**AI-driven Flutter development with mandatory human approval gates. Each phase requires explicit approval before proceeding. No skipping.**
-
-**Workflow**: PRD → Approval → Tech Spec → Approval → Test Cases → Approval → Development → Delivery
+嚴格遵守「需求 → PRD 生成 → ⚠️ 用戶審批 → 技術方案 → ⚠️ 用戶審批 → 測試用例 → ⚠️ 用戶審批 → 實現 → AI 自測 → 交付」的閉環開發流程。每個階段必須獲得用戶審批後才能進入下一階段。
 
 ---
 
-## When to Use
+## 何時使用
 
-| Situation | Action |
-|-----------|--------|
-| Starting new Flutter feature | Start from Phase 1: PRD |
-| Continuing after PRD approved | Go to Phase 2: Tech Spec |
-| After Tech Spec approved | Go to Phase 3: Test Cases |
-| After Test Cases approved | Go to Phase 4: Development |
-| Ready for delivery | Execute Phase 5: Acceptance |
-
----
-
-## ⚠️ CRITICAL ENFORCEMENT RULES
-
-### Rule 1: Approval Gate Rule
-
-**Each phase MUST be approved before next phase begins. No exceptions.**
-
-```
-❌ FORBIDDEN: Proceeding to next phase without approval
-✅ MANDATORY: Wait for human approval after each phase
-```
-
-**Approval Format Required:**
-```
-✅ [Phase Name] 已完成，等待審批
-
-階段：[名稱]
-產出：[文件列表]
-下一步：請確認後回复"批准"或"需要修改"
-```
-
-### Rule 2: The "Done" Rule
-
-**You MUST see evidence before claiming completion.**
-
-```
-❌ FORBIDDEN: "Done" / "完成了" / "好了" without showing tool outputs
-✅ MANDATORY: Say "done" ONLY after showing ALL verification outputs
-```
-
-### Rule 3: Sequential Verification Rule
-
-**Verification steps CANNOT be reordered or skipped.**
-
-```
-Write tool → ls → wc -c → Read → Reply to user
-```
-
-### Rule 4: Screenshot ≠ Evidence Rule
-
-```
-❌ Screenshot of UI = NOT sufficient evidence
-✅ Actual command output (flutter analyze, flutter test, ls, wc) = EVIDENCE
-```
+| 情況 | 行動 |
+|------|------|
+| 收到新功能需求 | 從階段一：PRD 生成開始 |
+| PRD 已審批通過 | 進入階段二：技術方案 |
+| 技術方案已審批通過 | 進入階段三：測試用例 |
+| 測試用例已審批通過 | 進入階段四：實現 |
+| 實現完成 | 執行階段五：AI 自測 → 階段六：交付 |
 
 ---
 
-## Workflow Phases
+## 紅線規則（不可違反）
 
-### Phase 1: Generate PRD
+### 規則一：審批門禁
+每個階段必須獲得用戶 ✅ 審批通過後才能進入下一階段，絕對不允許跳過。
 
-**Owner**: AI Agent → Human Approval
+### 規則二：SSOT 交付驗證
+每次聲稱「已交付」前，必須依序執行 Write → ls → wc -c → Read，用機械約束防止假交付。
 
-**Steps:**
+### 規則三：證據優先
+截圖不等於證據。只有命令行輸出（flutter analyze、flutter test、ls、wc）才是有效證據。
 
-1. **Analyze Requirement**
-   - Clarify ambiguous points
-   - Ask Owner 4 Questions:
-     1. What is the ROOT CAUSE of this problem?
-     2. Who else will be affected?
-     3. How to prevent next time?
-     4. Where is the data?
+---
 
-2. **Create PRD Document**
-   - Location: `docs/PRD/v{major}.{minor}_{NAME}.md`
-   - Content:
-     - 審批狀態
-     - 功能概述（背景問題、重構目標）
+## 階段一：需求 → PRD 生成
+
+**負責方**：AI Agent
+
+**步驟**：
+
+1. **分析需求**
+   - 理清模糊點
+   - 提出四個問題：
+     1. 這個問題的根因是什麼？
+     2. 會影響到誰？
+     3. 如何防止下次再發生？
+     4. 數據在哪裡？
+
+2. **生成 PRD 文檔**
+   - 路徑：`docs/PRD/v{major}.{minor}_{NAME}.md`
+   - 必須包含以下內容：
+     - 版本號、日期、狀態（🔄 起草中）
+     - 功能概述（背景問題、目標）
      - 用戶場景（核心場景、用戶價值）
-     - 詳細設計（架構變更、UI變更、數據模型）
-     - **驗收標準**（可量化、可測試）
-     - 執行記錄（時間、結果、Owner）
+     - 詳細設計（頁面結構、數據模型、API 調用、狀態處理）
+     - 驗收標準（可量化、可測試，分 P0/P1 優先級）
+     - 技術依賴
+     - 執行記錄
 
-3. **SSOT Verification**
+3. **SSOT 驗證**
    ```bash
    ls -la docs/PRD/v{major}.{minor}_{NAME}.md
    wc -c docs/PRD/v{major}.{minor}_{NAME}.md
    head -10 docs/PRD/v{major}.{minor}_{NAME}.md
    ```
 
-**Phase Output:**
-- PRD file created at correct location
-- SSOT verification outputs shown
-- Ready for human approval
+4. **提交審批**
 
-**Approval Request Format:**
+**審批請求格式：**
 ```
-✅ PRD 已生成，等待審批
+⚠️ [審批請求] PRD 已生成，等待您的審批
 
 文件：docs/PRD/v{major}.{minor}_{NAME}.md
-驗收標準：共 N 項
+驗收標準：共 N 項（P0: X 項, P1: Y 項）
 
 請確認：
 - 功能概述是否準確？
 - 驗收標準是否完整可測試？
 - 用戶場景是否覆蓋核心流程？
 
-回复"批准"繼續，或"需要修改" + 具體要求
+回覆「批准」繼續，或「需修改」+ 具體要求
 ```
 
 ---
 
-### Phase 2: Generate Technical Solution
+## ⚠️ 用戶審批（門禁 1）
 
-**Owner**: AI Agent → Human Approval
+用戶審核 PRD 文檔內容。
 
-**Prerequisite**: PRD approved
+| 結果 | 行動 |
+|------|------|
+| ✅ 批准 | 進入階段二：技術方案 |
+| ❌ 需修改 | 根據反饋修改後重新提交審批 |
 
-**Steps:**
+---
 
-1. **Analyze PRD**
-   - Read approved PRD
-   - Understand acceptance criteria
-   - Identify technical challenges
+## 階段二：技術方案
 
-2. **Create Technical Solution**
-   - Location: `docs/TECH/v{major}.{minor}_{NAME}.md`
-   - Content:
+**負責方**：AI Agent  
+**前置條件**：PRD 審批通過
+
+**步驟**：
+
+1. **分析 PRD**
+   - 閱讀已審批的 PRD
+   - 理解驗收標準
+   - 識別技術挑戰
+
+2. **生成技術方案文檔**
+   - 路徑：`docs/TECH/v{major}.{minor}_{NAME}.md`
+   - 必須包含以下內容：
      - 現有架構分析
-     - 目標架構
+     - 目標架構設計
      - 具體修改方案（每個文件的變更內容）
-     - 數據遷移策略（如有）
-     - 測試驗證命令（flutter analyze、build）
+     - 數據遷移策略（如需要）
+     - 測試驗證命令
      - 執行計劃（步驟清單）
 
-3. **SSOT Verification**
+3. **SSOT 驗證**
    ```bash
    ls -la docs/TECH/v{major}.{minor}_{NAME}.md
    wc -c docs/TECH/v{major}.{minor}_{NAME}.md
    head -10 docs/TECH/v{major}.{minor}_{NAME}.md
    ```
 
-**Phase Output:**
-- Technical solution file created
-- SSOT verification outputs shown
-- Ready for human approval
+4. **提交審批**
 
-**Approval Request Format:**
+**審批請求格式：**
 ```
-✅ 技術方案已生成，等待審批
+⚠️ [審批請求] 技術方案已生成，等待您的審批
 
 文件：docs/TECH/v{major}.{minor}_{NAME}.md
 修改文件：共 N 個
@@ -168,266 +136,269 @@ Write tool → ls → wc -c → Read → Reply to user
 - 修改方案是否可行？
 - 測試驗證命令是否正確？
 
-回复"批准"繼續，或"需要修改" + 具體要求
+回覆「批准」繼續，或「需修改」+ 具體要求
 ```
 
 ---
 
-### Phase 3: Generate AI Self-Test Test Cases
+## ⚠️ 用戶審批（門禁 2）
 
-**Owner**: AI Agent → Human Approval
+用戶審核技術方案文檔內容。
 
-**Prerequisite**: Technical solution approved
+| 結果 | 行動 |
+|------|------|
+| ✅ 批准 | 進入階段三：測試用例 |
+| ❌ 需修改 | 根據反饋修改後重新提交審批 |
 
-**Steps:**
+---
 
-1. **Analyze Technical Solution**
-   - Read approved technical solution
-   - Understand file changes
-   - Map to acceptance criteria
+## 階段三：測試用例
 
-2. **Create Test Cases**
-   - Location: `docs/TEST/TEST_CASES_v{major}.{minor}_{NAME}.md`
-   - Location: `test/{feature}_test.dart` (code tests)
+**負責方**：AI Agent  
+**前置條件**：技術方案審批通過
 
-   **Test Case Structure:**
+**步驟**：
 
-   | TC-XXX | 測試項 | 前置條件 | 測試步驟 | 預期結果 | 斷言 |
-   |--------|--------|---------|---------|---------|------|
-   | TC-001 | 功能描述 | 條件 | 步驟 | 結果 | 斷言 |
+1. **分析技術方案**
+   - 閱讀已審批的技術方案
+   - 理解文件變更
+   - 將驗收標準逐一映射到測試用例
 
-   **Test Types Required:**
-   - 單元測試（數據模型、Controller邏輯）
-   - Widget測試（UI組件交互）
+2. **生成測試用例**
+   - 文檔路徑：`docs/TEST/TEST_CASES_v{major}.{minor}_{NAME}.md`
+   - 代碼路徑：`test/{feature}_test.dart`
+
+   **測試用例文檔結構：**
+
+   | TC-XXX | 模塊 | 測試項 | 優先級 | 前置條件 | 測試步驟 | 預期結果 | 斷言 |
+   |--------|------|--------|--------|---------|---------|---------|------|
+
+   **必須覆蓋的測試類型：**
+   - 單元測試（數據模型、業務邏輯）
+   - Widget 測試（UI 組件交互）
    - 集成測試（完整頁面流程）
-   - 回歸測試（不破壞現有功能）
+   - 回歸測試（確保不破壞現有功能）
 
-3. **SSOT Verification**
+3. **SSOT 驗證**
    ```bash
    ls -la docs/TEST/TEST_CASES_v{major}.{minor}_{NAME}.md
    ls -la test/{feature}_test.dart
    wc -c docs/TEST/TEST_CASES_v{major}.{minor}_{NAME}.md
    ```
 
-**Phase Output:**
-- Test case document created
-- Code test files created
-- SSOT verification outputs shown
-- Ready for human approval
+4. **提交審批**
 
-**Approval Request Format:**
+**審批請求格式：**
 ```
-✅ 測試用例已生成，等待審批
+⚠️ [審批請求] 測試用例已生成，等待您的審批
 
 文檔：docs/TEST/TEST_CASES_v{major}.{minor}_{NAME}.md
 代碼：test/{feature}_test.dart
-測試項：共 N 項 TC
+測試項：共 N 項（單元: X, Widget: Y, 集成: Z, 回歸: W）
 
 請確認：
-- 驗收標準是否都有對應TC？
-- 測試覆蓋是否完整（單元/Widget/集成/回歸）？
+- 驗收標準是否都有對應 TC？
+- 測試覆蓋是否完整？
 - 斷言是否合理可執行？
 
-回复"批准"繼續，或"需要修改" + 具體要求
+回覆「批准」繼續，或「需修改」+ 具體要求
 ```
 
 ---
 
-### Phase 4: AI Development with Self-Test
+## ⚠️ 用戶審批（門禁 3）
 
-**Owner**: AI Agent
+用戶審核測試用例內容。
 
-**Prerequisite**: Test cases approved
-
-**Steps:**
-
-1. **Implement Code**
-   - Write code following technical solution
-   - Code + tests delivered TOGETHER
-   - No regression (existing tests still pass)
-
-2. **Self-Test Verification (MANDATORY - 5 steps)**
-
-   **All 5 steps MUST be executed. Output MUST be shown.**
-
-   ```bash
-   # STEP 1: Code Analysis
-   flutter analyze
-   # Must see: "0 issues"
-
-   # STEP 2: Run Tests
-   flutter test
-   # Must see: "All X/Y tests passed"
-
-   # STEP 3: iOS Build
-   flutter build ios --simulator --no-codesign
-   # Must see: "Built build/ios/iphonesimulator/Runner.app"
-
-   # STEP 4: Console Error Check (MANDATORY)
-   xcrun simctl spawn "iPhone 16 Pro" log show --predicate 'subsystem == "Flutter"' --last 1m 2>&1 | grep -i error
-   # Must see: 0 errors
-
-   # STEP 5: Regression
-   flutter test
-   # All existing tests STILL pass
-   ```
-
-3. **Test Case Coverage Verification**
-   - Each TC must have corresponding test result
-   - Report template below
-
-**Phase Output:**
-- All code implemented
-- All 5 verification steps passed
-- Test case coverage 100%
+| 結果 | 行動 |
+|------|------|
+| ✅ 批准 | 進入階段四：實現 |
+| ❌ 需修改 | 根據反饋修改後重新提交審批 |
 
 ---
 
-### Phase 5: Delivery Acceptance
+## 階段四：實現
 
-**Owner**: Human Approval
+**負責方**：AI Agent  
+**前置條件**：測試用例審批通過
 
-**Prerequisite**: All self-tests passed
+**步驟**：
 
-**Steps:**
+1. 依照技術方案文檔編寫代碼
+2. 依照測試用例編寫測試代碼，代碼與測試同步交付
+3. 確保現有測試不受影響（回歸安全）
+4. 每個文件完成後執行 SSOT 驗證（ls + wc）
 
-1. **SSOT Delivery Verification (MANDATORY)**
+---
 
-   ```bash
-   # 1. File existence
-   ls -la {modified_files}
+## 階段五：AI 自測
 
-   # 2. File non-empty
-   wc -c {modified_files}
+**負責方**：AI Agent  
+**前置條件**：實現完成
 
-   # 3. Content valid
-   head -3 {modified_files}
-   ```
+### 5.1 標準化自測命令（全部強制執行，必須展示輸出）
 
-2. **Self-Test Report Submission**
+```bash
+# 步驟 1：靜態代碼分析
+flutter analyze
+# 合格標準：0 issues
 
-   AI submits completed verification report
+# 步驟 2：運行測試
+flutter test
+# 合格標準：All tests passed
 
-3. **Human Acceptance**
+# 步驟 3：構建驗證
+flutter build ios --simulator --no-codesign
+# 合格標準：Built build/ios/iphonesimulator/Runner.app
 
-   Human reviews and approves delivery
+# 步驟 4：Console 錯誤檢查
+xcrun simctl spawn "iPhone 16 Pro" log show --predicate 'subsystem == "Flutter"' --last 1m 2>&1 | grep -i error
+# 合格標準：0 errors
 
-**Delivery Format:**
+# 步驟 5：回歸測試
+flutter test
+# 合格標準：所有已有測試仍然通過
+```
+
+### 5.2 驗收標準覆蓋檢查
+
+逐條對照 PRD 中的驗收標準表，確認每條均已實現。
+
+### 5.3 測試用例執行報告
+
+```
+| TC | 測試項 | 狀態 |
+|----|--------|------|
+| TC-001 | ... | ✅ |
+| TC-002 | ... | ✅ |
+```
+
+---
+
+## 階段六：交付
+
+**負責方**：AI Agent → 用戶  
+**前置條件**：所有自測通過
+
+### 6.1 SSOT 交付驗證（機械約束 - 每步必須執行並展示輸出）
+
+```bash
+# 1. 確認文件存在
+ls -la <路徑>
+
+# 2. 確認文件非空
+wc -c <路徑>
+
+# 3. 確認內容正確
+head -3 <路徑>
+```
+
+**禁止行為：**
+- 只說「已完成」但未提供命令輸出
+- 用截圖代替命令行輸出
+- 跳過任一驗證步驟
+- 從記憶中構造輸出而非實際執行命令
+
+### 6.2 交付格式
 
 ```
 ✅ 交付驗收
 
 修改文件：
-- {file1}
-- {file2}
+- docs/PRD/vX.Y_NAME.md
+- docs/TECH/vX.Y_NAME.md
+- docs/TEST/TEST_CASES_vX.Y.md
+- lib/... (N 個文件)
 
-驗證輸出：
-- flutter analyze: 0 issues
-- flutter test: X/Y passed
-- iOS build: Built build/ios/iphonesimulator/Runner.app
-- Console check: 0 errors
+自測結果：
+- flutter analyze: 0 issues ✅
+- flutter test: X/Y passed ✅
+- flutter build: 成功 ✅
+- Console check: 0 errors ✅
 
 測試用例覆蓋：
-- TC-001: ✅ 已實現
-- TC-002: ✅ 已實現
-...
+- 全部 TC 通過 ✅
 
 請確認驗收
 ```
 
 ---
 
-## Core Principles (MUST FOLLOW)
-
-| Principle | What It Means |
-|-----------|---------------|
-| **Owner Mindset** | This is YOUR feature, YOUR bug |
-| **Approval Gate** | Each phase requires human approval |
-| **Test-First** | Write tests BEFORE code |
-| **SSOT Verification** | Tools > your claims |
-| **100% Coverage** | All TCs must pass |
-| **No Shortcuts** | Every step must be executed |
-
----
-
-## Document Directory Standards (MANDATORY)
+## 文檔目錄規範
 
 ```
-docs/
-├── PRD/          ← All PRD documents (feature specs)
-├── TECH/         ← All technical design documents
-├── TEST/         ← All test case documents
-└── AI/           ← AI knowledge base (skills/flows/templates)
-
-test/             ← Code test files
+項目根目錄/
+├── docs/
+│   ├── PRD/       ← 產品需求文檔
+│   ├── TECH/      ← 技術方案文檔
+│   └── TEST/      ← 測試用例文檔
+└── test/          ← 代碼測試文件
 ```
 
-| Type | Location | Naming |
-|------|----------|--------|
+| 類型 | 路徑 | 命名規則 |
+|------|------|---------|
 | PRD | `docs/PRD/` | `v{major}.{minor}_{NAME}.md` |
-| Technical | `docs/TECH/` | `v{major}.{minor}_{NAME}.md` |
-| Test Cases | `docs/TEST/` | `TEST_CASES_v{major}.{minor}_{NAME}.md` |
-| Code Tests | `test/` | `{feature}_test.dart` |
+| 技術方案 | `docs/TECH/` | `v{major}.{minor}_{NAME}.md` |
+| 測試用例文檔 | `docs/TEST/` | `TEST_CASES_v{major}.{minor}_{NAME}.md` |
+| 測試代碼 | `test/` | `{feature}_test.dart` |
 
 ---
 
-## Approval Status Definitions
+## 審批狀態定義
 
-| Status | Meaning |
-|--------|---------|
-| 🔄 起草中 | Document being written |
-| ⚠️ 待審批 | Completed, waiting for approval |
-| ✅ 通過 | Approved, can proceed |
-| ❌ 否決 | Rejected, needs revision |
-
----
-
-## Owner Mindset 4 Questions (ASK BEFORE DELIVERY)
-
-1. **What is the ROOT CAUSE?**
-2. **Who else will be affected?**
-3. **How to PREVENT next time?**
-4. **Where is the DATA?**
+| 狀態 | 標記 | 含義 |
+|------|------|------|
+| 起草中 | 🔄 | 文檔正在編寫 |
+| 待審批 | ⚠️ | 完成，等待用戶審批 |
+| 已通過 | ✅ | 用戶審批通過，可進入下一階段 |
+| 已拒絕 | ❌ | 需修改後重新提交 |
 
 ---
 
-## Self-Test Report Template
+## Owner 心態四問
+
+每次交付前自問：
+1. 根因是什麼？
+2. 會影響誰？
+3. 如何防止復現？
+4. 數據在哪裡？
+
+---
+
+## 自測報告模板
 
 ```markdown
-## AI Self-Test Report: {Feature Name}
+## AI 自測報告：{功能名稱}
 
-**Date**: {YYYY-MM-DD HH:MM}
-**Phase**: 交付驗收
+**日期**：{YYYY-MM-DD HH:MM}
 
-### Verification Results
+### 驗證結果
 
-| Check | Output | Status |
-|-------|--------|--------|
+| 檢查項 | 輸出 | 狀態 |
+|--------|------|------|
 | flutter analyze | {X issues} | ✅/❌ |
 | flutter test | {X/Y passed} | ✅/❌ |
-| iOS build | {success message} | ✅/❌ |
+| flutter build | {結果} | ✅/❌ |
 | Console check | {X errors} | ✅/❌ |
 
-### Test Case Coverage
+### 測試用例覆蓋
 
-| TC | Test Item | Status |
-|----|-----------|--------|
-| TC-001 | {description} | ✅/❌ |
-| TC-002 | {description} | ✅/❌ |
+| TC | 測試項 | 狀態 |
+|----|--------|------|
+| TC-001 | ... | ✅/❌ |
+| TC-002 | ... | ✅/❌ |
 
-### Modified Files
+### 修改文件
 
-| File | LS Output | WC Output |
-|------|-----------|-----------|
-| {path} | {output} | {bytes} |
+| 文件路徑 | ls 結果 | wc 結果 |
+|---------|---------|---------|
+| ... | ✅ | X bytes |
 
-### Conclusion
+### 結論
 
-{All pass → "✅ READY FOR ACCEPTANCE" / Any fail → "❌ INCOMPLETE"}
+✅ 可交付 / ❌ 未完成
 ```
 
 ---
 
-**Owner**: AI Agent (Claude Code)
-
-**This skill enforces strict approval-gated workflow. No phase may be skipped.**
+**Owner**: AI Agent
